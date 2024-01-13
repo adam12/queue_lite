@@ -4,7 +4,11 @@ require "test_helper"
 
 class Job
   def self.perform(arg_1, arg_2)
-    [arg_1, arg_2]
+    performances << [arg_1, arg_2]
+  end
+
+  def self.performances
+    @performances ||= []
   end
 end
 
@@ -35,18 +39,13 @@ class TestQueueLite < Minitest::Test
   end
 
   def test_work_queue
-    require "json"
     q = QueueLite::Queue.build(":memory:")
     3.times do
       q.put(JSON.generate(["Job", 1, 2]))
     end
 
-    3.times do
-      task = q.pop
-      klass, *args = JSON.parse(task.data)
-      result = Object.const_get(klass).perform(*args)
-      q.done(task.id)
-      assert_equal [1, 2], result
-    end
+    worker = QueueLite::Worker.new(q)
+    3.times { worker.run_once }
+    assert_equal [[1, 2], [1, 2], [1, 2]], Job.performances
   end
 end

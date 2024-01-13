@@ -2,9 +2,46 @@
 
 require_relative "queue_lite/version"
 require "sqlite3"
+require "json"
 
 module QueueLite
   class Error < StandardError; end
+
+  class Worker
+    def initialize(queue)
+      @queue = queue
+      @running = false
+    end
+
+    def run
+      @running = true
+      while @running
+        run_once
+      end
+    end
+
+    def run_once
+      task = queue.pop
+      return if task.nil?
+
+      klass, *args = JSON.parse(task.data)
+      begin
+        Object.const_get(klass).perform(*args).tap do
+          queue.done(task.id)
+        end
+      rescue
+        queue.failed(task.id)
+      end
+    end
+
+    def shutdown
+      @running = false
+    end
+
+    private
+
+    attr_reader :queue
+  end
 
   class Queue
     READY_STATUS = "ready"
