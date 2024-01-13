@@ -7,7 +7,15 @@ class TestQueueLite < Minitest::Test
     refute_nil ::QueueLite::VERSION
   end
 
-  def test_it_does_something_useful
-    assert false
+  def test_implementation
+    q = QueueLite::Queue.build(":memory:")
+
+    q.put("Hello")
+    q.put("World")
+
+    task = q.pop
+
+    q.done(task.id)
+    q.get(task.id)
   end
 end
