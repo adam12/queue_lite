@@ -62,6 +62,6 @@ class TestQueueLite < Minitest::Test
 
     klass.enqueue("foo")
 
-    p q.pop
+    q.pop
   end
 end
