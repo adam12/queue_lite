@@ -41,8 +41,8 @@ module QueueLite
       SQL
     end
 
-    def put(message)
-      row = db.execute(<<~SQL, [message, READY_STATUS]).first
+    def put(data)
+      row = db.execute(<<~SQL, [data, READY_STATUS]).first
         INSERT INTO queue(data, status) VALUES(?, ?)
         RETURNING id, data
       SQL
