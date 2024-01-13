@@ -48,4 +48,20 @@ class TestQueueLite < Minitest::Test
     3.times { worker.perform_once }
     assert_equal [[1, 2], [1, 2], [1, 2]], Job.performances
   end
+
+  def test_enqueue
+    q = QueueLite::Queue.build(":memory:")
+
+    klass = Class.new do
+      extend QueueLite::Enqueue.new(q)
+
+      def self.perform(arg)
+        p "performed", arg
+      end
+    end
+
+    klass.enqueue("foo")
+
+    p q.pop
+  end
 end
