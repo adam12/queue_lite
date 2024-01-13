@@ -72,7 +72,6 @@ module QueueLite
         UPDATE queue
         SET status = ?
         WHERE id = ?
-        -- LIMIT 1 -- Why doesn't this work
         RETURNING id, data
       SQL
 
