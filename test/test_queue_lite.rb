@@ -18,7 +18,8 @@ class TestQueueLite < Minitest::Test
     q.done(task.id)
     q.get(task.id)
 
-    3.times { q.pop }
+    task = q.pop
+    q.failed(task.id)
   end
 
   def test_no_rows_to_pop_returns_nil

@@ -9,6 +9,7 @@ module QueueLite
   class Queue
     READY_STATUS = "ready"
     LOCKED_STATUS = "locked"
+    FAILED_STATUS = "failed"
 
     Task = Data.define(:id, :data) do
       def initialize(data: nil, **)
@@ -69,6 +70,17 @@ module QueueLite
 
     def done(id)
       row = db.get_first_row(<<~SQL, [LOCKED_STATUS, id])
+        UPDATE queue
+        SET status = ?
+        WHERE id = ?
+        RETURNING id, data
+      SQL
+
+      Task.new(*row)
+    end
+
+    def failed(id)
+      row = db.get_first_row(<<~SQL, [FAILED_STATUS, id])
         UPDATE queue
         SET status = ?
         WHERE id = ?
