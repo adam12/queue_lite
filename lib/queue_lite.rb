@@ -42,7 +42,7 @@ module QueueLite
     end
 
     def put(data)
-      row = db.execute(<<~SQL, [data, READY_STATUS]).first
+      row = db.get_first_row(<<~SQL, [data, READY_STATUS])
         INSERT INTO queue(data, status) VALUES(?, ?)
         RETURNING id, data
       SQL
@@ -51,7 +51,7 @@ module QueueLite
     end
 
     def pop
-      row = db.execute(<<~SQL, [LOCKED_STATUS, READY_STATUS]).first
+      row = db.get_first_row(<<~SQL, [LOCKED_STATUS, READY_STATUS])
         UPDATE queue
         SET status = ?
         WHERE rowid = (SELECT rowid
@@ -68,7 +68,7 @@ module QueueLite
     end
 
     def done(id)
-      row = db.execute(<<~SQL, [LOCKED_STATUS, id]).first
+      row = db.get_first_row(<<~SQL, [LOCKED_STATUS, id])
         UPDATE queue
         SET status = ?
         WHERE id = ?
@@ -80,7 +80,7 @@ module QueueLite
     end
 
     def get(id)
-      row = db.execute(<<~SQL, [id]).first
+      row = db.get_first_row(<<~SQL, [id])
         SELECT id, data
         FROM queue
         WHERE id = ?
