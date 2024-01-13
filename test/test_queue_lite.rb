@@ -17,5 +17,13 @@ class TestQueueLite < Minitest::Test
 
     q.done(task.id)
     q.get(task.id)
+
+    3.times { q.pop }
+  end
+
+  def test_no_rows_to_pop_returns_nil
+    q = QueueLite::Queue.build(":memory:")
+
+    assert_nil q.pop
   end
 end

@@ -62,6 +62,8 @@ module QueueLite
         RETURNING id, data
       SQL
 
+      return if row.nil?
+
       Task.new(*row)
     end
 
