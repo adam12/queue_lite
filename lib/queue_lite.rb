@@ -16,11 +16,11 @@ module QueueLite
     def run
       @running = true
       while @running
-        run_once
+        perform_once
       end
     end
 
-    def run_once
+    def perform_once
       task = queue.pop
       return if task.nil?
 

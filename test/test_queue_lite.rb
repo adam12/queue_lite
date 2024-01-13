@@ -45,7 +45,7 @@ class TestQueueLite < Minitest::Test
     end
 
     worker = QueueLite::Worker.new(q)
-    3.times { worker.run_once }
+    3.times { worker.perform_once }
     assert_equal [[1, 2], [1, 2], [1, 2]], Job.performances
   end
 end
